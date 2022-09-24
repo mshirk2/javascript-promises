@@ -2,28 +2,43 @@ url = 'http://deckofcardsapi.com/api/deck';
 
 // 1.
 
-let newDeck1 = axios.get(`${url}/new/shuffle/?deck_count=1`);
-let deckID1 = newDeck1.deck_id;
-
-let newCard = axios.get(`${url}/${deckID1}/draw/?count=1`)
-	.then(console.log(newCard.value," of ", newCard.suit));
+axios.get(`${url}/new/draw/?count=1`)
+	.then(res => {
+		let {suit, value} = res.data.cards[0];
+		console.log(`${value} of  ${suit}`);
+	});
 
 // 2.
+let firstCard = null;
+axios.get(`${url}/new/draw/?count=1`)
+	.then(res => {
+		firstCard = res.data.cards[0];
+		let deckID = res.data.deck_id;
+		return axios.get(`${url}/${deckID}/draw/?count=1`)
+	})
+	.then(res => {
+		let secondCard = res.data.cards[0];
+		[firstCard, secondCard].forEach(card => {
+			console.log(`${card.value} of ${card.suit}`)
+		})
+	});
 
-let newDeck2 = axios.get(`${url}/new/shuffle/?deck_count=1`);
-let deckID2 = newDeck2.deck_id;
-
-let firstCard = axios.get(`${url}/${deckID2}/draw/?count=1`);
-let secondCard = axios.get(`${url}/${deckID2}/draw/?count=1`)
-	.then(console.log(firstCard.value," of ", firstCard.suit))
-	.then(console.log(secondCard.value," of ", secondCard.suit));
-
-// 3.
+// // 3.
 let $button = $("#draw");
-let getDeck = axios.get(`${url}/new/shuffle/?deck_count=1`)
-let deckID = getDeck.deck_id;
+let $cardArea = $("#card-area")
+let deckID = null;
+
+axios.get(`${url}/new/shuffle/?deck_count=1`).then(res => {
+	deckID = res.data.deck_id;
+})
 
 $button.on('click', () => {
-	let card = axios.get(`${url}/${deckID}/draw/?count=1`)
-		.then(console.log(card.value," of ", card.suit));
+	axios.get(`${url}/${deckID}/draw/?count=1`)
+		.then(res => {
+			let cardImg = res.data.cards[0].image;
+			$cardArea.append(
+				$("<img>", {src: cardImg})
+			)
+			if(res.data.remaining === 0) $button.remove();
+		});
 });

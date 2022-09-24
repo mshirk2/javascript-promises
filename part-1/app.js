@@ -15,10 +15,11 @@ Promise.all(
     Array.from({ length: 4 }, () => {
         return axios.get(`${url}${num}?json`);
     })
-).then(data => {console.log(data)})
-.then(res => { 
-    res.forEach(data => 
-        document.getElementById('container')
-        .append(`${data.text}`)
-    );
-});
+)
+    .then(data => {console.log(data)})
+    .then(res => { 
+        res.forEach(data => 
+            document.getElementById('container')
+            .append(`${data.text}`)
+        );
+    });
